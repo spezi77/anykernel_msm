@@ -17,9 +17,13 @@ fi
 
 # Modifications to init.mako.rc
 if [ $francotweaks -eq 0 ] ; then
-sed '/scaling_governor/ s/ondemand/interactive/hellsactive/g' -i init.mako.rc
-sed '/ondemand/ d' -i init.mako.rc
+sed '/scaling_governor/ s/ondemand/hellsactive/g' -i init.mako.rc
+sed '/scaling_governor/ s/interactive/hellsactive/g' -i init.mako.rc
+sed '/scaling_governor/ s/intelliactive/hellsactive/g' -i init.mako.rc
+sed '/scaling_governor/ s/conservative/hellsactive/g' -i init.mako.rc
 
+sed '/cpu3\/cpufreq\/scaling_min_freq 81000/ a\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
+sed '/cpu3\/cpufreq\/scaling_min_freq 94000/ a\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
 sed '/cpu3\/cpufreq\/scaling_min_freq 384000/ a\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
 sed '/cpu0\/cpufreq\/scaling_max_freq 1512000/ a\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
 sed '/cpu1\/cpufreq\/scaling_max_freq 1512000/ a\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
@@ -47,25 +51,6 @@ sed '/hellsactive\/timer_slack 80000/ a\    write /sys/devices/system/cpu/cpufre
 sed '/hellsactive\/two_phase_freq "1350000,1350000,1350000,1350000"/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/input_boost_freq 1026000' -i init.mako.rc
 sed '/hellsactive\/input_boost_freq 1026000/ a\    # GPU' -i init.mako.rc
 sed '/hellsactive\/input_boost_freq 1026000/ a\\' -i init.mako.rc
-
-sed '/# GPU/ a\    write /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk 200000000' -i init.mako.rc
-sed '/kgsl-3d0\/max_gpuclk 200000000/ a\    # I/O' -i init.mako.rc
-sed '/kgsl-3d0\/max_gpuclk 200000000/ a\\' -i init.mako.rc
-
-sed '/# I\/O/ a\    write /sys/block/mmcblk0/queue/nomerges 1' -i init.mako.rc
-sed '/queue\/nomerges 1/ a\    write /sys/block/mmcblk0/queue/rq_affinity 2' -i init.mako.rc
-sed '/queue\/rq_affinity 2/ a\    write /sys/block/mmcblk0/queue/add_random 0' -i init.mako.rc
-sed '/queue\/add_random 0/ a\    write /sys/block/mmcblk0/bdi/min_ratio 5' -i init.mako.rc
-sed '/bdi\/min_ratio 5/ a\    # KSM' -i init.mako.rc
-sed '/bdi\/min_ratio 5/ a\\' -i init.mako.rc
-
-sed '/# KSM/ a\    write /sys/kernel/mm/ksm/sleep_millisecs 1500' -i init.mako.rc
-sed '/ksm\/sleep_millisecs 1500/ a\    write /sys/kernel/mm/ksm/pages_to_scan 256' -i init.mako.rc
-sed '/ksm\/pages_to_scan 256/ a\    write /sys/kernel/mm/ksm/deferred_timer 1' -i init.mako.rc
-sed '/ksm\/deferred_timer 1/ a\    write /sys/kernel/mm/ksm/run 1' -i init.mako.rc
-
-sed '/group radio system/ a\    disabled' -i init.mako.rc
-sed '/group root system/ a\    disabled' -i init.mako.rc
 fi
 
 # Modifications to init.rc
