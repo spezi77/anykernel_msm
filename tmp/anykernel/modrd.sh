@@ -17,7 +17,7 @@ fi
 
 # Modifications to init.mako.rc
 if [ $francotweaks -eq 0 ] ; then
-sed '/scaling_governor/ s/ondemand/interactive/g' -i init.mako.rc
+sed '/scaling_governor/ s/ondemand/interactive/hellsactive/g' -i init.mako.rc
 sed '/ondemand/ d' -i init.mako.rc
 
 sed '/cpu3\/cpufreq\/scaling_min_freq 384000/ a\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
@@ -28,31 +28,29 @@ sed '/# disable diag port/ i\    write /sys/devices/system/cpu/cpu1/online 1' -i
 sed '/# disable diag port/ i\    write /sys/devices/system/cpu/cpu2/online 0' -i init.mako.rc
 sed '/# disable diag port/ i\    write /sys/devices/system/cpu/cpu3/online 0' -i init.mako.rc
 sed '/# disable diag port/ i\\' -i init.mako.rc
-sed '/# disable diag port/ i\    # Interactive' -i init.mako.rc
+sed '/# disable diag port/ i\    # hellsactive' -i init.mako.rc
 sed '/# disable diag port/ i\\' -i init.mako.rc
 
-sed '/# Interactive/ a\    restorecon_recursive /sys/devices/system/cpu/cpufreq/interactive' -i init.mako.rc
-sed '/restorecon_recursive \/sys\/devices\/system\/cpu\/cpufreq\/interactive/ a\    write /sys/devices/system/cpu/cpufreq/interactive/above_hispeed_delay "20000 1026000:60000 1242000:150000"' -i init.mako.rc
-sed '/interactive\/above_hispeed_delay "20000 1026000:60000 1242000:150000"/ a\    write /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load 99' -i init.mako.rc
-sed '/interactive\/go_hispeed_load 99/ a\    write /sys/devices/system/cpu/cpufreq/interactive/hispeed_freq 384000' -i init.mako.rc
-sed '/interactive\/hispeed_freq 384000/ a\    write /sys/devices/system/cpu/cpufreq/interactive/io_is_busy 1' -i init.mako.rc
-sed '/interactive\/io_is_busy 1/ a\    write /sys/devices/system/cpu/cpufreq/interactive/target_loads "90 384000:40 1026000:80 1242000:95"' -i init.mako.rc
-sed '/interactive\/target_loads "90 384000:40 1026000:80 1242000:95"/ a\    write /sys/devices/system/cpu/cpufreq/interactive/min_sample_time 60000' -i init.mako.rc
-sed '/interactive\/min_sample_time 60000/ a\    write /sys/devices/system/cpu/cpufreq/interactive/timer_rate 30000' -i init.mako.rc
-sed '/interactive\/timer_rate 30000/ a\    write /sys/devices/system/cpu/cpufreq/interactive/max_freq_hysteresis 100000' -i init.mako.rc
-sed '/interactive\/max_freq_hysteresis 100000/ a\    write /sys/devices/system/cpu/cpufreq/interactive/timer_slack 80000' -i init.mako.rc
-sed '/interactive\/timer_slack 80000/ a\    # GPU' -i init.mako.rc
-sed '/interactive\/timer_slack 80000/ a\\' -i init.mako.rc
+sed '/# hellsactive/ a\    restorecon_recursive /sys/devices/system/cpu/cpufreq/hellsactive' -i init.mako.rc
+sed '/restorecon_recursive \/sys\/devices\/system\/cpu\/cpufreq\/hellsactive/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/above_hispeed_delay "20000 1026000:60000 1242000:150000"' -i init.mako.rc
+sed '/hellsactive\/above_hispeed_delay "20000 1026000:60000 1242000:150000"/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/align_windows 1' -i init.mako.rc
+sed '/hellsactive\/align_windows 1/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/boostpulse_duration 1000000' -i init.mako.rc
+sed '/hellsactive\/boostpulse_duration 1000000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/go_hispeed_load 99' -i init.mako.rc
+sed '/hellsactive\/go_hispeed_load 99/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/hispeed_freq 1134000' -i init.mako.rc
+sed '/hellsactive\/hispeed_freq 1134000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/io_is_busy 1' -i init.mako.rc
+sed '/hellsactive\/io_is_busy 1/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/target_loads "90 384000:40 1026000:80 1242000:95"' -i init.mako.rc
+sed '/hellsactive\/target_loads "90 384000:40 1026000:80 1242000:95"/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/min_sample_time 80000' -i init.mako.rc
+sed '/hellsactive\/min_sample_time 80000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/timer_rate 20000' -i init.mako.rc
+sed '/hellsactive\/timer_rate 20000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/max_freq_hysteresis 0' -i init.mako.rc
+sed '/hellsactive\/max_freq_hysteresis 0/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/timer_slack 80000' -i init.mako.rc
+sed '/hellsactive\/timer_slack 80000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/two_phase_freq "1350000,1350000,1350000,1350000"' -i init.mako.rc
+sed '/hellsactive\/two_phase_freq "1350000,1350000,1350000,1350000"/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/input_boost_freq 1026000' -i init.mako.rc
+sed '/hellsactive\/input_boost_freq 1026000/ a\    # GPU' -i init.mako.rc
+sed '/hellsactive\/input_boost_freq 1026000/ a\\' -i init.mako.rc
 
 sed '/# GPU/ a\    write /sys/devices/platform/kgsl-3d0.0/kgsl/kgsl-3d0/max_gpuclk 200000000' -i init.mako.rc
-sed '/kgsl-3d0\/max_gpuclk 200000000/ a\    # Cpu-Boost' -i init.mako.rc
+sed '/kgsl-3d0\/max_gpuclk 200000000/ a\    # I/O' -i init.mako.rc
 sed '/kgsl-3d0\/max_gpuclk 200000000/ a\\' -i init.mako.rc
-
-sed '/# Cpu-Boost/ a\    write /sys/module/cpu_boost/parameters/boost_ms 20' -i init.mako.rc
-sed '/cpu_boost\/parameters\/boost_ms 20/ a\    write /sys/module/cpu_boost/parameters/input_boost_freq 1026000' -i init.mako.rc
-sed '/cpu_boost\/parameters\/input_boost_freq 1026000/ a\    write /sys/module/cpu_boost/parameters/input_boost_ms 100' -i init.mako.rc
-sed '/cpu_boost\/parameters\/input_boost_ms 100/ a\    # I/O' -i init.mako.rc
-sed '/cpu_boost\/parameters\/input_boost_ms 100/ a\\' -i init.mako.rc
 
 sed '/# I\/O/ a\    write /sys/block/mmcblk0/queue/nomerges 1' -i init.mako.rc
 sed '/queue\/nomerges 1/ a\    write /sys/block/mmcblk0/queue/rq_affinity 2' -i init.mako.rc
@@ -72,5 +70,5 @@ fi
 
 # Modifications to init.rc
 if [ $francotweaks -eq 0 ] ; then
-sed '/sys\/devices\/system\/cpu\/cpufreq\/interactive/ s/0660/0664/g' -i init.rc
+sed '/sys\/devices\/system\/cpu\/cpufreq\/hellsactive/ s/0660/0664/g' -i init.rc
 fi
