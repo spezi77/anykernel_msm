@@ -4,13 +4,21 @@
 # Updated for HellSpawn use by spezi77
 #
 
-# Config for msm_mpdecision based kernel
+# Config for msm_mpdecision based kernel (0..off / 1..on)
 msm_mpdecision=0
 
 # Check to see if the ramdisk has already been patched
 bstweaks=`grep -c "# CPU HOTPLUG tweaks" init.mako.rc`
 if [ $bstweaks -eq 0 ] ; then
     bstweaks=`grep -c "# <-- HellSpawn Tweaks" init.mako.rc`
+else
+    # Substitute tweaks header
+    sed 's/CPU HOTPLUG tweaks/<-- HellSpawn Tweaks BEGIN -->/' -i init.mako.rc
+    # Add marker to indicate where HS tweaks have an end
+    sed '/# disable diag port/ {
+            i\    # <-- HellSpawn Tweaks END -->
+            i\\
+            }' -i init.mako.rc
 fi
 
 # Apply patch only if necessary
@@ -27,6 +35,8 @@ if [ $msm_mpdecision -eq 1 ] ; then
     stopthe=1
 fi
 
+    # Remove end marker (if applicable)
+    sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
     sed '/# disable diag port/ {
             i\    # <-- HellSpawn Tweaks BEGIN -->
             i\\
@@ -98,6 +108,46 @@ fi
             i\\
         }' -i init.mako.rc
     fi
+    sed '/# disable diag port/ {
+            i\    # <-- HellSpawn Tweaks END -->
+            i\\
+            }' -i init.mako.rc
+fi
+
+# Consider whether kernel should be configured for msm_mpdecision 
+if [ $msm_mpdecision -eq 1 ] ; then
+    # Check to see if there's any occurence of stop mpdecision in the ramdisk
+    stopmpd=`grep -c "stop mpdecision" init.mako.rc`
+    # Check to see if there's any occurence of stop thermald in the ramdisk
+    stopthe=`grep -c "stop thermald" init.mako.rc`
+
+    # Allow mpdecision if not set in the ramdisk
+    if [ $stopmpd -eq 1 ] ; then
+        sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
+        sed '/# Disable mpdecision/ d' -i init.mako.rc
+        sed -e '/stop mpdecision/ { N; d; }' -i init.mako.rc
+        sed '/# disable diag port/ {
+            i\    # communicate with mpdecision and thermald
+            i\    mkdir /dev/socket/mpdecision 2770 root system
+            i\\
+            i\    # Enable msm_mpdecision
+            i\    write /sys/module/msm_mpdecision/enabled 1
+            i\\
+            }'  -i init.mako.rc
+    fi
+
+    # Allow thermald if not set in the ramdisk
+    if [ $stopthe -eq 1 ] ; then
+        sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
+        sed '/# Disable thermald/ d' -i init.mako.rc
+        sed -e '/stop thermald/ { N; d; }' -i init.mako.rc
+        sed '/# disable diag port/ {
+            i\    # Enable thermald service
+            i\    write /sys/module/msm_thermal/parameters/enabled 1
+            i\\
+            }'  -i init.mako.rc
+    fi
+    # Add marker to indicate where HS tweaks have an end
     sed '/# disable diag port/ {
             i\    # <-- HellSpawn Tweaks END -->
             i\\
