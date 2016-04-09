@@ -4,8 +4,8 @@
 # Updated for HellSpawn use by spezi77
 #
 
-# Config for msm_mpdecision based kernel (0..off / 1..on)
-msm_mpdecision=0
+# Config for making bricked the default hotplug (0..off / 1..on)
+bricked_hotplug=0
 
 # Check to see if the ramdisk has already been patched
 hstweaks=`grep -c "# <-- HellSpawn Tweaks" init.mako.rc`
@@ -16,13 +16,13 @@ fi
 if [ $hstweaks -gt 0 ] ; then
     # Substitute tweaks header (if applicable)
     sed 's/CPU HOTPLUG tweaks/<-- HellSpawn Tweaks BEGIN -->/' -i init.mako.rc
-    forceupd=`grep -c "# Enable msm_mpdecision" init.mako.rc`
-    # Force update occurs when someone comes from HS with msm_mpdecision and is about to dirty flash HS with mako-hotplug
-    if [[ $forceupd -eq 1 && msm_mpdecision -eq 0 ]] ; then
+    forceupd=`grep -c "# Disable mako-hotplug" init.mako.rc`
+    # Force update occurs when someone comes from HS with bricked_hotplug and is about to dirty flash HS with mako-hotplug
+    if [[ $forceupd -eq 1 && bricked_hotplug -eq 0 ]] ; then
         # Remove mpdecision settings
         sed -e '/# communicate with mpdecision and thermald/  { N; d; }' -i init.mako.rc
-        sed -e '/# Enable msm_mpdecision/ { N; d; }' -i init.mako.rc
-        sed -e '/# Enable thermald service/ { N; d; }' -i init.mako.rc
+        sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
         # let's go through the patch routine
         hstweaks=0
     else
@@ -34,7 +34,6 @@ if [ $hstweaks -gt 0 ] ; then
     fi
 fi
 
-
 # Apply patch only if necessary
 if [ $hstweaks -eq 0 ] ; then
     # Check to see if there's any occurence of stop mpdecision in the ramdisk
@@ -43,11 +42,6 @@ if [ $hstweaks -eq 0 ] ; then
     stopthe=`grep -c "stop thermald" init.mako.rc`
     # Check to see if there's any occurence of hellsactive in the ramdisk
     hellsac=`grep -c "hellsactive" init.mako.rc`
-
-    if [ $msm_mpdecision -eq 1 ] ; then
-        stopmpd=1
-        stopthe=1
-    fi
 
     # Remove end marker (if applicable)
     sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
@@ -63,7 +57,7 @@ if [ $hstweaks -eq 0 ] ; then
         sed '/# communicate with mpdecision and thermald/ d' -i init.mako.rc
         sed -e '/mpdecision 2770 root system/ { N; d; }' -i init.mako.rc
         sed '/# disable diag port/ {
-            i\    # Disable mpdecision service to prevent conflicts with mako-hotplug
+            i\    # Disable mpdecision service to prevent conflicts with other hotplug drivers
             i\    stop mpdecision
             i\\
             }'  -i init.mako.rc
@@ -76,6 +70,19 @@ if [ $hstweaks -eq 0 ] ; then
         sed '/# disable diag port/ {
             i\    # Disable thermald service
             i\    stop thermald
+            i\\
+            }'  -i init.mako.rc
+    fi
+
+    if [[ $forceupd -eq 1 && bricked_hotplug -eq 0 ]] ; then
+        # Remove duplicate settings
+        sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
+
+        # Disable bricked_hotplug, mako-hotplug is per default enabled
+        sed '/# disable diag port/ {
+            i\    # Disable bricked-hotplug in favor of using mako-hotplug
+            i\    write /sys/kernel/msm_mpdecision/conf/enabled 0
             i\\
             }'  -i init.mako.rc
     fi
@@ -132,43 +139,18 @@ if [ $hstweaks -eq 0 ] ; then
             }' -i init.mako.rc
 fi
 
-# Consider whether kernel should be configured for msm_mpdecision 
-if [ $msm_mpdecision -eq 1 ] ; then
-    # Check to see if there's any occurence of stop mpdecision in the ramdisk
-    stopmpd=`grep -c "stop mpdecision" init.mako.rc`
-    # Check to see if there's any occurence of stop thermald in the ramdisk
-    stopthe=`grep -c "stop thermald" init.mako.rc`
-
-    # Ensure that the ramdisk does not have commands which prevent mpdecision/thermald
-    if [ $stopmpd -eq 1 ] ; then
-        sed '/# Disable mpdecision/ d' -i init.mako.rc
-        sed -e '/stop mpdecision/ { N; d; }' -i init.mako.rc
-    fi
-    if [ $stopthe -eq 1 ] ; then
-        sed '/# Disable thermald/ d' -i init.mako.rc
-        sed -e '/stop thermald/ { N; d; }' -i init.mako.rc
-    fi
+# Consider whether kernel should be configured for bricked_hotplug 
+if [ $bricked_hotplug -eq 1 ] ; then
 
     # Prevent duplicates
     sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
-    sed -e '/# communicate with mpdecision and thermald/  { N; d; }' -i init.mako.rc
-    sed -e '/# Enable msm_mpdecision/ { N; d; }' -i init.mako.rc
-    sed -e '/# Enable thermald service/ { N; d; }' -i init.mako.rc
+    sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
 
-    # Allow mpdecision & thermald, enable msm_mpdecision
+    # Disable mako-hotplug, bricked_hotplug is per default enabled
     sed '/# disable diag port/ {
-        i\    # communicate with mpdecision and thermald
-        i\    mkdir /dev/socket/mpdecision 2770 root system
-        i\\
-        i\    # Enable msm_mpdecision
-        i\    write /sys/module/msm_mpdecision/enabled 1
-        i\\
-        }'  -i init.mako.rc
-
-    # Enable thermald
-    sed '/# disable diag port/ {
-        i\    # Enable thermald service
-        i\    write /sys/module/msm_thermal/parameters/enabled 1
+        i\    # Disable mako-hotplug in favor of using bricked-hotplug
+        i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
         }'  -i init.mako.rc
 
