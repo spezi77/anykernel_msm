@@ -1,59 +1,97 @@
 #!/sbin/sh
 # modrd.sh initially made by Ziddey
 #
-# Updated for Marshmallow use by Zaclimon
+# Updated for HellSpawn use by spezi77
 #
 
-
-# Check to see if there's any occurence of franco's tweaks in the ramdisk
-francotweaks=`grep -c "import init.performance_profiles.rc" init.mako.rc`
-
-# Apply performance profiles stuff
-if [ $francotweaks -eq 0 ] ; then
-sed '/import init.mako.tiny.rc/ a\import init.performance_profiles.rc' -i init.mako.rc
-cp ../init.performance_profiles.rc ./
-chmod 0755 init.performance_profiles.rc
+# Check to see if the ramdisk has already been patched
+bstweaks=`grep -c "# CPU HOTPLUG tweaks" init.mako.rc`
+if [ $bstweaks -eq 0 ] ; then
+    bstweaks=`grep -c "# <-- HellSpawn Tweaks" init.mako.rc`
 fi
 
-# Modifications to init.mako.rc
-if [ $francotweaks -eq 0 ] ; then
-sed '/scaling_governor/ s/ondemand/hellsactive/g' -i init.mako.rc
-sed '/scaling_governor/ s/interactive/hellsactive/g' -i init.mako.rc
-sed '/scaling_governor/ s/intelliactive/hellsactive/g' -i init.mako.rc
-sed '/scaling_governor/ s/conservative/hellsactive/g' -i init.mako.rc
+# Apply patch only if necessary
+if [ $bstweaks -eq 0 ] ; then
+    # Check to see if there's any occurence of stop mpdecision in the ramdisk
+    stopmpd=`grep -c "stop mpdecision" init.mako.rc`
+    # Check to see if there's any occurence of stop thermald in the ramdisk
+    stopthe=`grep -c "stop thermald" init.mako.rc`
+    # Check to see if there's any occurence of hellsactive in the ramdisk
+    hellsac=`grep -c "hellsactive" init.mako.rc`
 
-sed '/cpu3\/cpufreq\/scaling_min_freq 81000/ a\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
-sed '/cpu3\/cpufreq\/scaling_min_freq 94000/ a\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
-sed '/cpu3\/cpufreq\/scaling_min_freq 384000/ a\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
-sed '/cpu0\/cpufreq\/scaling_max_freq 1512000/ a\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
-sed '/cpu1\/cpufreq\/scaling_max_freq 1512000/ a\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
-sed '/cpu2\/cpufreq\/scaling_max_freq 1512000/ a\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq 1512000' -i init.mako.rc
-sed '/# disable diag port/ i\    write /sys/devices/system/cpu/cpu1/online 1' -i init.mako.rc
-sed '/# disable diag port/ i\    write /sys/devices/system/cpu/cpu2/online 0' -i init.mako.rc
-sed '/# disable diag port/ i\    write /sys/devices/system/cpu/cpu3/online 0' -i init.mako.rc
-sed '/# disable diag port/ i\\' -i init.mako.rc
-sed '/# disable diag port/ i\    # hellsactive' -i init.mako.rc
-sed '/# disable diag port/ i\\' -i init.mako.rc
+    sed '/# disable diag port/ {
+            i\    # <-- HellSpawn Tweaks BEGIN -->
+            i\\
+            }' -i init.mako.rc
 
-sed '/# hellsactive/ a\    restorecon_recursive /sys/devices/system/cpu/cpufreq/hellsactive' -i init.mako.rc
-sed '/restorecon_recursive \/sys\/devices\/system\/cpu\/cpufreq\/hellsactive/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/above_hispeed_delay "20000 1026000:60000 1242000:150000"' -i init.mako.rc
-sed '/hellsactive\/above_hispeed_delay "20000 1026000:60000 1242000:150000"/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/align_windows 1' -i init.mako.rc
-sed '/hellsactive\/align_windows 1/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/boostpulse_duration 1000000' -i init.mako.rc
-sed '/hellsactive\/boostpulse_duration 1000000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/go_hispeed_load 99' -i init.mako.rc
-sed '/hellsactive\/go_hispeed_load 99/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/hispeed_freq 1134000' -i init.mako.rc
-sed '/hellsactive\/hispeed_freq 1134000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/io_is_busy 1' -i init.mako.rc
-sed '/hellsactive\/io_is_busy 1/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/target_loads "90 384000:40 1026000:80 1242000:95"' -i init.mako.rc
-sed '/hellsactive\/target_loads "90 384000:40 1026000:80 1242000:95"/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/min_sample_time 80000' -i init.mako.rc
-sed '/hellsactive\/min_sample_time 80000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/timer_rate 20000' -i init.mako.rc
-sed '/hellsactive\/timer_rate 20000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/max_freq_hysteresis 0' -i init.mako.rc
-sed '/hellsactive\/max_freq_hysteresis 0/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/timer_slack 80000' -i init.mako.rc
-sed '/hellsactive\/timer_slack 80000/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/two_phase_freq "1350000,1350000,1350000,1350000"' -i init.mako.rc
-sed '/hellsactive\/two_phase_freq "1350000,1350000,1350000,1350000"/ a\    write /sys/devices/system/cpu/cpufreq/hellsactive/input_boost_freq 1026000' -i init.mako.rc
-sed '/hellsactive\/input_boost_freq 1026000/ a\    # GPU' -i init.mako.rc
-sed '/hellsactive\/input_boost_freq 1026000/ a\\' -i init.mako.rc
-fi
+    # Stop mpdecision if not set in the ramdisk
+    if [ $stopmpd -eq 0 ] ; then
+        sed '/# communicate with mpdecision and thermald/ d' -i init.mako.rc
+        sed -e '/mpdecision 2770 root system/ { N; d; }' -i init.mako.rc
+        sed '/# disable diag port/ {
+            i\    # Disable mpdecision service to prevent conflicts with mako-hotplug
+            i\    stop mpdecision
+            i\\
+            }'  -i init.mako.rc
+    fi
 
-# Modifications to init.rc
-if [ $francotweaks -eq 0 ] ; then
-sed '/sys\/devices\/system\/cpu\/cpufreq\/hellsactive/ s/0660/0664/g' -i init.rc
+    # Stop thermald if not set in the ramdisk
+    if [ $stopthe -eq 0 ] ; then
+        sed '/# communicate with mpdecision and thermald/ d' -i init.mako.rc
+        sed -e '/mpdecision 2770 root system/ { N; d; }' -i init.mako.rc
+        sed '/# disable diag port/ {
+            i\    # Disable thermald service
+            i\    stop thermald
+            i\\
+            }'  -i init.mako.rc
+    fi
+
+    # Set CPU governor to hellsactive if not set in the ramdisk
+    if [ $hellsac -eq 0 ] ; then
+        # Remove current cpu and gpu settings if present
+        sed '/sys\/devices\/system\/cpu/ d' -i init.mako.rc
+        sed '/kgsl/ d' -i init.mako.rc
+
+        # Add HellSpawn Tweaks
+        sed '/# disable diag port/ {
+            i\    # HellsActive Tweaks
+            i\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "hellsactive"
+            i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "hellsactive"
+            i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "hellsactive"
+            i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor "hellsactive"
+    restorecon_recursive /sys/devices/system/cpu/cpufreq/hellsactive
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/above_hispeed_delay 20000
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/align_windows 1
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/boostpulse_duration 1000000
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/closest_freq_selection 0
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/freq_calc_thresh 94500
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/go_hispeed_load 99
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/hispeed_freq 1134000
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/input_boost_freq 1026000
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/io_is_busy 1
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/max_freq_hysteresis 0
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/min_sample_time 80000
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/target_loads 90
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/timer_rate 20000
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/timer_slack 80000
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/two_phase_freq 1350000,1350000,1350000,1350000
+            i\    write /sys/devices/system/cpu/cpufreq/hellsactive/use_freq_calc_thresh 1
+            i\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 94000
+            i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq 94000
+            i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq 94000
+            i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq 94000
+            i\    write /sys/devices/system/cpu/cpu0/cpufreq/screen_off_max_freq 1026000
+            i\    write /sys/devices/system/cpu/cpu1/cpufreq/screen_off_max_freq 1026000
+            i\    write /sys/devices/system/cpu/cpu2/cpufreq/screen_off_max_freq 1026000
+            i\    write /sys/devices/system/cpu/cpu3/cpufreq/screen_off_max_freq 1026000
+            i\\
+            i\    # Set GPU governor to simple
+            i\    write /sys/class/kgsl/kgsl-3d0/pwrscale/trustzone/governor simple
+            i\\
+        }' -i init.mako.rc
+    fi
+    sed '/# disable diag port/ {
+            i\    # <-- HellSpawn Tweaks END -->
+            i\\
+            }' -i init.mako.rc
 fi
