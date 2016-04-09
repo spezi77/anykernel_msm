@@ -4,6 +4,9 @@
 # Updated for HellSpawn use by spezi77
 #
 
+# Config for msm_mpdecision based kernel
+msm_mpdecision=0
+
 # Check to see if the ramdisk has already been patched
 bstweaks=`grep -c "# CPU HOTPLUG tweaks" init.mako.rc`
 if [ $bstweaks -eq 0 ] ; then
@@ -18,6 +21,11 @@ if [ $bstweaks -eq 0 ] ; then
     stopthe=`grep -c "stop thermald" init.mako.rc`
     # Check to see if there's any occurence of hellsactive in the ramdisk
     hellsac=`grep -c "hellsactive" init.mako.rc`
+
+if [ $msm_mpdecision -eq 1 ] ; then
+    stopmpd=1
+    stopthe=1
+fi
 
     sed '/# disable diag port/ {
             i\    # <-- HellSpawn Tweaks BEGIN -->
