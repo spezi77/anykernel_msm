@@ -11,6 +11,8 @@ bricked_hotplug=0
 hstweaks=`grep -c "# <-- HellSpawn Tweaks" init.mako.rc`
 if [ $hstweaks -eq 0 ] ; then
     hstweaks=`grep -c "# CPU HOTPLUG tweaks" init.mako.rc`
+else
+    sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
 fi
 
 if [ $hstweaks -gt 0 ] ; then
@@ -25,12 +27,6 @@ if [ $hstweaks -gt 0 ] ; then
         sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
         # let's go through the patch routine
         hstweaks=0
-    else
-        # Add marker to indicate where HS tweaks have an end
-        sed '/# disable diag port/ {
-            i\    # <-- HellSpawn Tweaks END -->
-            i\\
-            }' -i init.mako.rc
     fi
 fi
 
@@ -70,19 +66,6 @@ if [ $hstweaks -eq 0 ] ; then
         sed '/# disable diag port/ {
             i\    # Disable thermald service
             i\    stop thermald
-            i\\
-            }'  -i init.mako.rc
-    fi
-
-    if [[ $forceupd -eq 1 && bricked_hotplug -eq 0 ]] ; then
-        # Remove duplicate settings
-        sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
-        sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
-
-        # Disable bricked_hotplug, mako-hotplug is per default enabled
-        sed '/# disable diag port/ {
-            i\    # Disable bricked-hotplug in favor of using mako-hotplug
-            i\    write /sys/kernel/msm_mpdecision/conf/enabled 0
             i\\
             }'  -i init.mako.rc
     fi
@@ -133,10 +116,6 @@ if [ $hstweaks -eq 0 ] ; then
             i\\
         }' -i init.mako.rc
     fi
-    sed '/# disable diag port/ {
-            i\    # <-- HellSpawn Tweaks END -->
-            i\\
-            }' -i init.mako.rc
 fi
 
 # Consider whether kernel should be configured for bricked_hotplug 
@@ -153,10 +132,23 @@ if [ $bricked_hotplug -eq 1 ] ; then
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
         }'  -i init.mako.rc
+else
+    # Remove duplicate settings
+    sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
+    sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
 
-    # Add marker to indicate where HS tweaks have an end
+    # Disable bricked_hotplug, mako-hotplug is per default enabled
     sed '/# disable diag port/ {
-            i\    # <-- HellSpawn Tweaks END -->
-            i\\
-            }' -i init.mako.rc
+        i\    # Disable bricked-hotplug in favor of using mako-hotplug
+        i\    write /sys/kernel/msm_mpdecision/conf/enabled 0
+        i\\
+        }'  -i init.mako.rc
 fi
+
+# Add marker to indicate where HS tweaks have an end
+sed '/# disable diag port/ {
+        i\    # <-- HellSpawn Tweaks END -->
+        i\\
+        }' -i init.mako.rc
+
