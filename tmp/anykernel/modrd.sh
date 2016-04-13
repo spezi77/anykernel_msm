@@ -4,8 +4,11 @@
 # Updated for HellSpawn use by spezi77
 #
 
-# Config for making bricked the default hotplug (0..off / 1..on)
+# Config for picking the default hotplug (0..off / 1..on)
+# Warning: Only enable one hotplug driver at a time!
 bricked_hotplug=0
+mako_hotplug=0
+autosmp_hotplug=1
 
 # Check to see if the ramdisk has already been patched
 hstweaks=`grep -c "# <-- HellSpawn Tweaks" init.mako.rc`
@@ -25,6 +28,7 @@ if [ $hstweaks -gt 0 ] ; then
         sed -e '/# communicate with mpdecision and thermald/  { N; d; }' -i init.mako.rc
         sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
         sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/# Disable autosmp-hotplug/ { N; d; }' -i init.mako.rc
         # let's go through the patch routine
         hstweaks=0
     fi
@@ -118,30 +122,55 @@ if [ $hstweaks -eq 0 ] ; then
     fi
 fi
 
-# Consider whether kernel should be configured for bricked_hotplug 
-if [ $bricked_hotplug -eq 1 ] ; then
 
+# CPU Hotplugs section
     # Prevent duplicates
     sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
-    sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
-    sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/bricked-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/autosmp-hotplug/ { N; d; }' -i init.mako.rc
 
-    # Disable mako-hotplug, bricked_hotplug is per default enabled
+if [ $bricked_hotplug -eq 1 ] ; then
+    # Set bricked_hotplug as default while other hotplugs are set to disabled
     sed '/# disable diag port/ {
-        i\    # Disable mako-hotplug in favor of using bricked-hotplug
+        i\    # Enable bricked-hotplug
+        i\    write /sys/kernel/msm_mpdecision/conf/enabled 1
+        i\\
+        i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
+        i\    # Disable autosmp-hotplug
+        i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
         }'  -i init.mako.rc
-else
-    # Remove duplicate settings
-    sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
-    sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
-    sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
+fi
 
-    # Disable bricked_hotplug, mako-hotplug is per default enabled
+if [ $mako_hotplug -eq 1 ] ; then
+    # Set mako-hotplug as default while other hotplugs are set to disabled
     sed '/# disable diag port/ {
-        i\    # Disable bricked-hotplug in favor of using mako-hotplug
+        i\    # Disable bricked-hotplug
         i\    write /sys/kernel/msm_mpdecision/conf/enabled 0
+        i\\
+        i\    # Enable mako-hotplug
+        i\    write /sys/class/misc/mako_hotplug_control/enabled 1
+        i\\
+        i\    # Disable autosmp-hotplug
+        i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
+        }'  -i init.mako.rc
+fi
+
+if [ $autosmp_hotplug -eq 1 ] ; then
+    # Set autosmp_hotplug as default while other hotplugs are set to disabled
+    sed '/# disable diag port/ {
+        i\    # Disable bricked-hotplug
+        i\    write /sys/kernel/msm_mpdecision/conf/enabled 0
+        i\\
+        i\    # Disable mako-hotplug
+        i\    write /sys/class/misc/mako_hotplug_control/enabled 0
+        i\\
+        i\    # Enable autosmp-hotplug
+        i\    write /sys/module/autosmp/parameters/enabled Y
         i\\
         }'  -i init.mako.rc
 fi
