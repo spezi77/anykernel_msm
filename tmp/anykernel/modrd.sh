@@ -6,9 +6,10 @@
 
 # Config for picking the default hotplug (0..off / 1..on)
 # Warning: Only enable one hotplug driver at a time!
-bricked_hotplug=0
+alucard_hotplug=0
 mako_hotplug=0
 autosmp_hotplug=1
+lazyplug=0
 
 # Check to see if the ramdisk has already been patched
 hstweaks=`grep -c "# <-- HellSpawn Tweaks" init.mako.rc`
@@ -23,12 +24,13 @@ if [ $hstweaks -gt 0 ] ; then
     sed 's/CPU HOTPLUG tweaks/<-- HellSpawn Tweaks BEGIN -->/' -i init.mako.rc
     forceupd=`grep -c "# Disable mako-hotplug" init.mako.rc`
     # Force update occurs when someone comes from HS with bricked_hotplug and is about to dirty flash HS with mako-hotplug
-    if [[ $forceupd -eq 1 && bricked_hotplug -eq 0 ]] ; then
+    if [ $forceupd -eq 1 ] ; then
         # Remove mpdecision settings
         sed -e '/# communicate with mpdecision and thermald/  { N; d; }' -i init.mako.rc
-        sed -e '/# Disable mako-hotplug/ { N; d; }' -i init.mako.rc
-        sed -e '/# Disable bricked-hotplug/ { N; d; }' -i init.mako.rc
-        sed -e '/# Disable autosmp-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/alucard-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/autosmp-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/lazy-hotplug/ { N; d; }' -i init.mako.rc
         # let's go through the patch routine
         hstweaks=0
     fi
@@ -106,10 +108,10 @@ if [ $hstweaks -eq 0 ] ; then
             i\    write /sys/devices/system/cpu/cpufreq/hellsactive/timer_slack 80000
             i\    write /sys/devices/system/cpu/cpufreq/hellsactive/two_phase_freq 1350000,1350000,1350000,1350000
             i\    write /sys/devices/system/cpu/cpufreq/hellsactive/use_freq_calc_thresh 1
-            i\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 94000
-            i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq 94000
-            i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq 94000
-            i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq 94000
+            i\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 384000
+            i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq 384000
+            i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq 384000
+            i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq 384000
             i\    write /sys/devices/system/cpu/cpu0/cpufreq/screen_off_max_freq 1026000
             i\    write /sys/devices/system/cpu/cpu1/cpufreq/screen_off_max_freq 1026000
             i\    write /sys/devices/system/cpu/cpu2/cpufreq/screen_off_max_freq 1026000
@@ -127,20 +129,24 @@ fi
     # Prevent duplicates
     sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
     sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
-    sed -e '/bricked-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/alucard-hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/autosmp-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/lazyplug/ { N; d; }' -i init.mako.rc
 
-if [ $bricked_hotplug -eq 1 ] ; then
-    # Set bricked_hotplug as default while other hotplugs are set to disabled
+if [ $alucard_hotplug -eq 1 ] ; then
+    # Set alucard_hotplug as default while other hotplugs are set to disabled
     sed '/# disable diag port/ {
-        i\    # Enable bricked-hotplug
-        i\    write /sys/kernel/msm_mpdecision/conf/enabled 1
+        i\    # Enable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 1
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
+        i\\   # Disable lazy-hotplug
+        i\    /sys/module/lazyplug/parameters/lazyplug_active 0
         i\\
         }'  -i init.mako.rc
 fi
@@ -148,8 +154,8 @@ fi
 if [ $mako_hotplug -eq 1 ] ; then
     # Set mako-hotplug as default while other hotplugs are set to disabled
     sed '/# disable diag port/ {
-        i\    # Disable bricked-hotplug
-        i\    write /sys/kernel/msm_mpdecision/conf/enabled 0
+        i\    # Disable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
         i\\
         i\    # Enable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 1
@@ -157,20 +163,44 @@ if [ $mako_hotplug -eq 1 ] ; then
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
+        i\\   # Disable lazy-hotplug
+        i\    /sys/module/lazyplug/parameters/lazyplug_active 0
+        i\\
         }'  -i init.mako.rc
 fi
 
 if [ $autosmp_hotplug -eq 1 ] ; then
     # Set autosmp_hotplug as default while other hotplugs are set to disabled
     sed '/# disable diag port/ {
-        i\    # Disable bricked-hotplug
-        i\    write /sys/kernel/msm_mpdecision/conf/enabled 0
+        i\    # Disable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
         i\    # Enable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled Y
+        i\\
+        i\\   # Disable lazy-hotplug
+        i\    /sys/module/lazyplug/parameters/lazyplug_active 0
+        i\\
+        }'  -i init.mako.rc
+fi
+
+if [ $lazyplug -eq 1 ] ; then
+    # Set lazyplug as default while other hotplugs are set to disabled
+    sed '/# disable diag port/ {
+        i\    # Disable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
+        i\\
+        i\    # Disable mako-hotplug
+        i\    write /sys/class/misc/mako_hotplug_control/enabled 0
+        i\\
+        i\    # Disable autosmp-hotplug
+        i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
+        i\\   # Enable lazy-hotplug
+        i\    /sys/module/lazyplug/parameters/lazyplug_active 1
         i\\
         }'  -i init.mako.rc
 fi
