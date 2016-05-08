@@ -8,6 +8,7 @@
 # Warning: Only enable one hotplug driver at a time!
 alucard_hotplug=0
 autosmp_hotplug=1
+intelliplug=0
 lazyplug=0
 mako_hotplug=0
 zendecision=0
@@ -28,10 +29,12 @@ if [ $hstweaks -gt 0 ] ; then
     if [ $forceupd -eq 1 ] ; then
         # Remove mpdecision settings
         sed -e '/# communicate with mpdecision and thermald/  { N; d; }' -i init.mako.rc
-        sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
         sed -e '/alucard-hotplug/ { N; d; }' -i init.mako.rc
         sed -e '/autosmp-hotplug/ { N; d; }' -i init.mako.rc
-        sed -e '/lazy-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/intelliplug/ { N; d; }' -i init.mako.rc
+        sed -e '/lazyplug/ { N; d; }' -i init.mako.rc
+        sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/zendecision/ { N; d; }' -i init.mako.rc
         # let's go through the patch routine
         hstweaks=0
     fi
@@ -131,6 +134,7 @@ fi
     sed -e '/# <-- HellSpawn Tweaks END -->/ { N; d; }' -i init.mako.rc
     sed -e '/alucard-hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/autosmp-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/intelliplug/ { N; d; }' -i init.mako.rc
     sed -e '/lazyplug/ { N; d; }' -i init.mako.rc
     sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/zendecision/ { N; d; }' -i init.mako.rc
@@ -144,6 +148,9 @@ if [ $alucard_hotplug -eq 1 ] ; then
         i\\
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
+        i\    # Disable intelliplug
+        i\    write /sys/module/intelli_plug/parameters/intelli_plug_active 0
         i\\
         i\\   # Disable lazy-hotplug
         i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
@@ -166,6 +173,33 @@ if [ $autosmp_hotplug -eq 1 ] ; then
         i\    # Enable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled Y
         i\\
+        i\    # Disable intelliplug
+        i\    write /sys/module/intelli_plug/parameters/intelli_plug_active 0
+        i\\
+        i\\   # Disable lazy-hotplug
+        i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
+        i\\
+        i\    # Disable mako-hotplug
+        i\    write /sys/class/misc/mako_hotplug_control/enabled 0
+        i\\
+        i\\   # Disable zendecision
+        i\    write /sys/kernel/zen_decision/enabled 0
+        i\\
+        }'  -i init.mako.rc
+fi
+
+if [ $intelliplug -eq 1 ] ; then
+    # Set intelliplug as default while other hotplugs are set to disabled
+    sed '/# disable diag port/ {
+        i\    # Disable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
+        i\\
+        i\    # Disable autosmp-hotplug
+        i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
+        i\    # Enable intelliplug
+        i\    write /sys/module/intelli_plug/parameters/intelli_plug_active 1
+        i\\
         i\\   # Disable lazy-hotplug
         i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
         i\\
@@ -187,8 +221,11 @@ if [ $lazyplug -eq 1 ] ; then
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
+        i\    # Disable intelliplug
+        i\    write /sys/module/intelli_plug/parameters/intelli_plug_active 0
+        i\\
         i\\   # Enable lazy-hotplug
-        i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
+        i\    write /sys/module/lazyplug/parameters/lazyplug_active 1
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
@@ -207,6 +244,9 @@ if [ $mako_hotplug -eq 1 ] ; then
         i\\
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
+        i\    # Disable intelliplug
+        i\    write /sys/module/intelli_plug/parameters/intelli_plug_active 0
         i\\
         i\\   # Disable lazy-hotplug
         i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
@@ -228,6 +268,9 @@ if [ $zendecision -eq 1 ] ; then
         i\\
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
+        i\    # Disable intelliplug
+        i\    write /sys/module/intelli_plug/parameters/intelli_plug_active 0
         i\\
         i\\   # Disable lazy-hotplug
         i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
