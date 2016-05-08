@@ -146,13 +146,13 @@ if [ $alucard_hotplug -eq 1 ] ; then
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
         i\\   # Disable lazy-hotplug
-        i\    /sys/module/lazyplug/parameters/lazyplug_active 0
+        i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
-        i\\   # Disble zendecision
-        i\    /sys/kernel/zen_decision/enabled 0
+        i\\   # Disable zendecision
+        i\    write /sys/kernel/zen_decision/enabled 0
         i\\
         }'  -i init.mako.rc
 fi
@@ -167,13 +167,13 @@ if [ $autosmp_hotplug -eq 1 ] ; then
         i\    write /sys/module/autosmp/parameters/enabled Y
         i\\
         i\\   # Disable lazy-hotplug
-        i\    /sys/module/lazyplug/parameters/lazyplug_active 0
+        i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
-        i\\   # Disble zendecision
-        i\    /sys/kernel/zen_decision/enabled 0
+        i\\   # Disable zendecision
+        i\    write /sys/kernel/zen_decision/enabled 0
         i\\
         }'  -i init.mako.rc
 fi
@@ -188,13 +188,13 @@ if [ $lazyplug -eq 1 ] ; then
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
         i\\   # Enable lazy-hotplug
-        i\    /sys/module/lazyplug/parameters/lazyplug_active 1
+        i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
-        i\\   # Disble zendecision
-        i\    /sys/kernel/zen_decision/enabled 0
+        i\\   # Disable zendecision
+        i\    write /sys/kernel/zen_decision/enabled 0
         i\\
         }'  -i init.mako.rc
 fi
@@ -209,13 +209,13 @@ if [ $mako_hotplug -eq 1 ] ; then
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
         i\\   # Disable lazy-hotplug
-        i\    /sys/module/lazyplug/parameters/lazyplug_active 0
+        i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
         i\\
         i\    # Enable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 1
         i\\
-        i\\   # Disble zendecision
-        i\    /sys/kernel/zen_decision/enabled 0
+        i\\   # Disable zendecision
+        i\    write /sys/kernel/zen_decision/enabled 0
         i\\
         }'  -i init.mako.rc
 fi
@@ -230,13 +230,13 @@ if [ $zendecision -eq 1 ] ; then
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
         i\\   # Disable lazy-hotplug
-        i\    /sys/module/lazyplug/parameters/lazyplug_active 0
+        i\    write /sys/module/lazyplug/parameters/lazyplug_active 0
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
         i\\   # Enable zendecision
-        i\    /sys/kernel/zen_decision/enabled 1
+        i\    write /sys/kernel/zen_decision/enabled 1
         i\\
         }'  -i init.mako.rc
 fi
