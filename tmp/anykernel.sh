@@ -33,7 +33,7 @@ cd ramdisk
 gzip -dc ../boot.img-ramdisk.gz | cpio -i
 chmod 0755 ../modrd.sh
 ../modrd.sh
-../smart-fstab-generator.sh $FSTAB
+#../smart-fstab-generator.sh $FSTAB
 
 find . | cpio --create --format='newc' | gzip > ../ramdisk.gz
 cd ..
