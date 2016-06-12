@@ -124,6 +124,9 @@ if [ $hstweaks -eq 0 ] ; then
             i\    # Set GPU governor to simple
             i\    write /sys/class/kgsl/kgsl-3d0/pwrscale/trustzone/governor simple
             i\\
+            i\    # Set FSYNC to enabled to prevent data loss
+            i\    write /sys/module/sync/parameters/fsync_enabled Y
+            i\\
         }' -i init.mako.rc
     fi
 fi
