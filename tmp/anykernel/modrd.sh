@@ -12,6 +12,7 @@ intelliplug=0
 dyn_hotplug=0
 mako_hotplug=0
 zendecision=0
+thunderplug=0
 
 # Check to see if the ramdisk has already been patched
 hstweaks=`grep -c "# <-- HellSpawn Tweaks" init.mako.rc`
@@ -34,6 +35,7 @@ if [ $hstweaks -gt 0 ] ; then
         sed -e '/intelliplug/ { N; d; }' -i init.mako.rc
         sed -e '/dyn_hotplug/ { N; d; }' -i init.mako.rc
         sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
+        sed -e '/thunderplug/ { N; d; }' -i init.mako.rc
         sed -e '/zendecision/ { N; d; }' -i init.mako.rc
         # let's go through the patch routine
         hstweaks=0
@@ -137,6 +139,7 @@ fi
     sed -e '/intelliplug/ { N; d; }' -i init.mako.rc
     sed -e '/dyn_hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
+    sed -e '/thunderplug/ { N; d; }' -i init.mako.rc
     sed -e '/zendecision/ { N; d; }' -i init.mako.rc
 
 
@@ -157,6 +160,9 @@ if [ $alucard_hotplug -eq 1 ] ; then
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
+        i\\
+        i\\   # Disable thunderplug
+        i\    write /sys/kernel/thunderplug/hotplug_enabled 0
         i\\
         i\\   # Disable zendecision
         i\    write /sys/kernel/zen_decision/enabled 0
@@ -182,6 +188,9 @@ if [ $autosmp_hotplug -eq 1 ] ; then
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
+        i\\   # Disable thunderplug
+        i\    write /sys/kernel/thunderplug/hotplug_enabled 0
+        i\\
         i\\   # Disable zendecision
         i\    write /sys/kernel/zen_decision/enabled 0
         i\\
@@ -205,6 +214,9 @@ if [ $intelliplug -eq 1 ] ; then
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
+        i\\
+        i\\   # Disable thunderplug
+        i\    write /sys/kernel/thunderplug/hotplug_enabled 0
         i\\
         i\\   # Disable zendecision
         i\    write /sys/kernel/zen_decision/enabled 0
@@ -230,6 +242,9 @@ if [ $dyn_hotplug -eq 1 ] ; then
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
         i\\
+        i\\   # Disable thunderplug
+        i\    write /sys/kernel/thunderplug/hotplug_enabled 0
+        i\\
         i\\   # Disable zendecision
         i\    write /sys/kernel/zen_decision/enabled 0
         i\\
@@ -254,6 +269,36 @@ if [ $mako_hotplug -eq 1 ] ; then
         i\    # Enable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 1
         i\\
+        i\\   # Disable thunderplug
+        i\    write /sys/kernel/thunderplug/hotplug_enabled 0
+        i\\
+        i\\   # Disable zendecision
+        i\    write /sys/kernel/zen_decision/enabled 0
+        i\\
+        }'  -i init.mako.rc
+fi
+
+if [ $thunderplug -eq 1 ] ; then
+    # Set thunderplug as default while other hotplugs are set to disabled
+    sed '/# disable diag port/ {
+        i\    # Disable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
+        i\\
+        i\    # Disable autosmp-hotplug
+        i\    write /sys/module/autosmp/parameters/enabled N
+        i\\
+        i\    # Disable intelliplug
+        i\    write /sys/module/intelli_plug/parameters/intelli_plug_active 0
+        i\\
+        i\\   # Disable dyn_hotplug
+        i\    write /sys/module/dyn_hotplug/parameters/enabled 0
+        i\\
+        i\    # Disable mako-hotplug
+        i\    write /sys/class/misc/mako_hotplug_control/enabled 0
+        i\\
+        i\\   # Enable thunderplug
+        i\    write /sys/kernel/thunderplug/hotplug_enabled 1
+        i\\
         i\\   # Disable zendecision
         i\    write /sys/kernel/zen_decision/enabled 0
         i\\
@@ -277,6 +322,9 @@ if [ $zendecision -eq 1 ] ; then
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
+        i\\
+        i\\   # Disable thunderplug
+        i\    write /sys/kernel/thunderplug/hotplug_enabled 0
         i\\
         i\\   # Enable zendecision
         i\    write /sys/kernel/zen_decision/enabled 1
