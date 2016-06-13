@@ -124,9 +124,6 @@ if [ $hstweaks -eq 0 ] ; then
             i\    # Set GPU governor to simple
             i\    write /sys/class/kgsl/kgsl-3d0/pwrscale/trustzone/governor simple
             i\\
-            i\    # Set FSYNC to enabled to prevent data loss
-            i\    write /sys/module/sync/parameters/fsync_enabled Y
-            i\\
         }' -i init.mako.rc
     fi
 fi
@@ -141,7 +138,8 @@ fi
     sed -e '/dyn_hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/zendecision/ { N; d; }' -i init.mako.rc
-
+    sed -e '/Set FSYNC to enabled/ { N; d; }' -i init.mako.rc
+    sed -e '/Disable fsync/ { N; d; }' -i init.mako.rc
 
 if [ $alucard_hotplug -eq 1 ] ; then
     # Set alucard_hotplug as default while other hotplugs are set to disabled
@@ -289,6 +287,9 @@ fi
 
 # Add marker to indicate where HS tweaks have an end
 sed '/# disable diag port/ {
+        i\    # Set FSYNC to enabled to prevent data loss
+        i\    write /sys/module/sync/parameters/fsync_enabled Y
+        i\\
         i\    # <-- HellSpawn Tweaks END -->
         i\\
         }' -i init.mako.rc
