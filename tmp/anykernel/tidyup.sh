@@ -3,13 +3,16 @@
 
 mount -o rw /system;
 
-
-# disable the PowerHAL since there is a kernel-side touch boost implemented
- [ -e /system/lib/hw/power.msm8960.so ] && mv /system/lib/hw/power.msm8960.so /system/lib/hw/power.msm8960.so.bak;
+# thermald.conf
+chown root.system system/etc/thermald.conf
+chmod 644 system/etc/thermald.conf
 
 # disable mpdecision
-
  [ -e /system/bin/mpdecision ] && mv /system/bin/mpdecision /system/bin/mpdecision.bak;
+
+# mpdfake
+chown root.system system/bin/mpdfake
+chmod 755 system/bin/mpdfake
 
 umount /system;
 
