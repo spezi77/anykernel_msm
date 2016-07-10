@@ -171,8 +171,8 @@ if [ $autosmp_hotplug -eq 1 ] ; then
         i\    # Disable alucard-hotplug
         i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
         i\\
-        i\    # Enable autosmp-hotplug
-        i\    write /sys/module/autosmp/parameters/enabled Y
+        i\    # Disable autosmp-hotplug
+        i\    write /sys/module/autosmp/parameters/enabled N
         i\\
         i\    # Disable intelliplug
         i\    write /sys/module/intelli_plug/parameters/intelli_plug_active 0
