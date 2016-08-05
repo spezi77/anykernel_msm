@@ -99,6 +99,9 @@ mako_hotplug=0
             i\    write /sys/devices/system/cpu/cpu1/cpufreq/util_threshold 30
             i\    write /sys/devices/system/cpu/cpu2/cpufreq/util_threshold 35
             i\    write /sys/devices/system/cpu/cpu3/cpufreq/util_threshold 40
+            i\    write /sys/devices/system/cpu/cpu1/online 1
+            i\    write /sys/devices/system/cpu/cpu2/online 0
+            i\    write /sys/devices/system/cpu/cpu3/online 0
             i\\
             i\    # Set GPU governor to interactive
             i\    write /sys/class/kgsl/kgsl-3d0/pwrscale/trustzone/governor interactive
