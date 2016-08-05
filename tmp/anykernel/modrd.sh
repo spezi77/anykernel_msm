@@ -105,6 +105,7 @@ mako_hotplug=0
             i\\
             i\    # Set GPU governor to interactive
             i\    write /sys/class/kgsl/kgsl-3d0/pwrscale/trustzone/governor interactive
+            i\    write /sys/class/kgsl/kgsl-3d0/max_gpuclk 200000000
             i\\
             i\    # Speed up io
             i\    write /sys/block/mmcblk0/queue/nr_requests 256
