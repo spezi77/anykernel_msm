@@ -3,13 +3,24 @@
 
 mount -o rw /system;
 
+# remove the binaries as they are no longer needed. (kernel handled)
+if [ -e /system/bin/mpdecision ] ; then
+	mv /system/bin/mpdecision /system/bin/mpdecision_bck
+fi
+if [ -e /system/bin/thermald ] ; then
+	mv /system/bin/thermald /system/bin/thermald_bck
+fi
+if [ -e /system/lib/hw/power.msm8960.so ] ; then
+	mv /system/lib/hw/power.msm8960.so /system/lib/hw/power.msm8960.so_bck
+fi
+if [ -e /system/lib/hw/power.mako.so ] ; then
+	mv /system/lib/hw/power.mako.so /system/lib/hw/power.mako.so_bck
+fi
 
-# disable the PowerHAL since there is a kernel-side touch boost implemented
- [ -e /system/lib/hw/power.msm8960.so ] && mv /system/lib/hw/power.msm8960.so /system/lib/hw/power.msm8960.so.bak;
-
-# disable mpdecision
-
- [ -e /system/bin/mpdecision ] && mv /system/bin/mpdecision /system/bin/mpdecision.bak;
+# mpdfake
+chown root.system system/bin/mpdfake
+chmod 755 system/bin/mpdfake
 
 umount /system;
 
+return $?
