@@ -110,6 +110,10 @@ mako_hotplug=0
             i\    # Speed up io
             i\    write /sys/block/mmcblk0/queue/nr_requests 256
             i\\
+            i\    # enable KSM
+            i\    write /sys/kernel/mm/ksm/run 1
+            i\    write /sys/kernel/mm/ksm/deferred_timer 1
+            i\\
         }' -i init.mako.rc
 
 # CPU Hotplugs section
