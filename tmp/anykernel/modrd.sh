@@ -124,6 +124,10 @@ if [ $hstweaks -eq 0 ] ; then
             i\    # Set GPU governor to simple
             i\    write /sys/class/kgsl/kgsl-3d0/pwrscale/trustzone/governor simple
             i\\
+            i\    # enable KSM
+            i\    write /sys/kernel/mm/ksm/run 1
+            i\    write /sys/kernel/mm/ksm/deferred_timer 1
+            i\\
         }' -i init.mako.rc
     fi
 fi
