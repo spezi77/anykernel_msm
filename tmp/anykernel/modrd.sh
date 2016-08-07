@@ -65,6 +65,7 @@ mako_hotplug=0
     # Start mpdfake
         sed '/# disable diag port/ {
             i\    # Run mpdfake service to absorb logcat spam
+            i\    mkdir /dev/socket/mpdfake 2770 root system
             i\    start mpdfake
             i\\
             }'  -i init.mako.rc
