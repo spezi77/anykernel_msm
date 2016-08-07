@@ -149,7 +149,6 @@ if [ $dyn_hotplug -eq 1 ] ; then
         i\    # Enable dyn_hotplug
         i\    write /sys/module/dyn_hotplug/parameters/enabled 1
         i\    write /sys/module/dyn_hotplug/parameters/down_timer_cnt 6
-        i\    write /sys/module/dyn_hotplug/parameters/up_threshold 75
         i\\
         i\    # Disable mako-hotplug
         i\    write /sys/class/misc/mako_hotplug_control/enabled 0
