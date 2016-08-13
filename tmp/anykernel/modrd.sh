@@ -23,7 +23,8 @@ mako_hotplug=0
     sed -e '/communicate with mpdecision and thermald/ d' -i init.mako.rc
     sed -e '/mpdecision 2770 root system/ { N; d; }' -i init.mako.rc
     sed -e '/Disable mpdecision/ { N; d; }' -i init.mako.rc
-    sed -e '/mpdfake/ d' -i init.mako.rc
+    sed -e '/Run mpdfake service to absorb logcat spam/ { N; d; }' -i init.mako.rc
+    sed -e '/start mpdfake/ d' -i init.mako.rc
     sed -e '/Disable thermald/ { N; d; }' -i init.mako.rc
     sed -e '/CPU governor/ d' -i init.mako.rc
     sed -e '/sys\/devices\/system\/cpu/ d' -i init.mako.rc
