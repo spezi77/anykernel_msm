@@ -23,7 +23,7 @@ mako_hotplug=0
     sed -e '/communicate with mpdecision and thermald/ d' -i init.mako.rc
     sed -e '/mpdecision 2770 root system/ { N; d; }' -i init.mako.rc
     sed -e '/Disable mpdecision/ { N; d; }' -i init.mako.rc
-    sed -e '/Run mpdfake service to absorb logcat spam/ { N; d; }' -i init.mako.rc
+    sed -e '/mpdfake/ d' -i init.mako.rc
     sed -e '/Disable thermald/ { N; d; }' -i init.mako.rc
     sed -e '/CPU governor/ d' -i init.mako.rc
     sed -e '/sys\/devices\/system\/cpu/ d' -i init.mako.rc
@@ -31,6 +31,10 @@ mako_hotplug=0
     sed -e '/Speed up io/ { N; d; }' -i init.mako.rc
     sed -e '/fsync/ d' -i init.mako.rc
     sed -e '/kgsl/ d' -i init.mako.rc
+    sed -e '/ksm/ d' -i init.mako.rc
+    sed -e '/KSM/ d' -i init.mako.rc
+    sed -e '/intelli_plug/ d' -i init.mako.rc
+    sed -e '/max_gpuclk/ d' -i init.mako.rc
 
     # Remove end marker (if applicable)
     sed -e '/# <-- Revival Tweaks END -->/ { N; d; }' -i init.mako.rc
@@ -131,7 +135,7 @@ if [ $autosmp_hotplug -eq 1 ] ; then
         i\    # Enable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled Y
         i\\
-        i\\   # Disable dyn_hotplug
+        i\    # Disable dyn_hotplug
         i\    write /sys/module/dyn_hotplug/parameters/enabled 0
         i\\
         i\    # Disable mako-hotplug
@@ -162,7 +166,7 @@ if [ $mako_hotplug -eq 1 ] ; then
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
-        i\\   # Disable dyn_hotplug
+        i\    # Disable dyn_hotplug
         i\    write /sys/module/dyn_hotplug/parameters/enabled 0
         i\\
         i\    # Enable mako-hotplug
