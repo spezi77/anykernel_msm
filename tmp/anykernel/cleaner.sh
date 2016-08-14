@@ -1,7 +1,14 @@
 #!/sbin/sh
 
-#clean modules
-rm -f /system/lib/modules
+# clean modules
+rm -rf /system/lib/modules
+
+# clean system binaries
+rm -rf /system/bin/mpdecision
+rm -rf /system/bin/thermald
+rm -f /system/lib/hw/power.msm8960.so
+rm -f /system/lib/hw/power.mako.so
+
 # clean init.d scripts
 INITD_DIR=/system/etc/init.d
 # Trinity
@@ -23,17 +30,19 @@ rm -f $INITD_DIR/00turtle
 rm -f $INITD_DIR/00confg
 # neo
 rm -rf $INITD_DIR/*Neo*
-rm -f /system/bin/*Neo*
+rm -rf /system/bin/*Neo*
 rm -rf /sdcard/neo
 # slim
 rm -rf $INITD_DIR/01mpdecision
 # ak
 rm -rf $INITD_DIR/00ak
 
-# clean kernel setting app shared_prefs
+# clean kernel settings apps shared_prefs
 rm -rf /data/data/mobi.cyann.nstools/shared_prefs
 rm -rf /data/data/aperture.ezekeel.gladoscontrol/shared_prefs
 rm -rf /data/data/com.derkernel.tkt/shared_prefs
 rm -rf /data/data/com.franco.kernel/shared_prefs
 rm -rf /data/data/com.liquid.control/shared_prefs
+rm -rf /data/data/com.grarak.kernelauditor/shared_prefs
+rm -rf /data/data/com.af.synapse/databases/*
 
