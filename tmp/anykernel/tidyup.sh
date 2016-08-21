@@ -17,10 +17,6 @@ if [ -e /system/lib/hw/power.mako.so ] ; then
 	mv /system/lib/hw/power.mako.so /system/lib/hw/power.mako.so_bck
 fi
 
-# thermald.conf
-chown root.system system/etc/thermald.conf
-chmod 644 system/etc/thermald.conf
-
 # mpdfake
 chown root.system system/bin/mpdfake
 chmod 755 system/bin/mpdfake
