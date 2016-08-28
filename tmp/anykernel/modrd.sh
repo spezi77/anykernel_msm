@@ -30,6 +30,7 @@ mako_hotplug=0
     sed -e '/sys\/devices\/system\/cpu/ d' -i init.mako.rc
     sed -e '/Slightly lower voltage/ { N; d; }' -i init.mako.rc
     sed -e '/Speed up io/ { N; d; }' -i init.mako.rc
+    sed -e '/scheduler/ d' -i init.mako.rc
     sed -e '/fsync/ d' -i init.mako.rc
     sed -e '/kgsl/ d' -i init.mako.rc
     sed -e '/ksm/ d' -i init.mako.rc
@@ -115,6 +116,7 @@ mako_hotplug=0
             i\\
             i\    # Speed up io
             i\    write /sys/block/mmcblk0/queue/nr_requests 256
+            i\    write /sys/block/mmcblk0/queue/scheduler tripndroid
             i\\
             i\    # enable KSM
             i\    write /sys/kernel/mm/ksm/run 1
