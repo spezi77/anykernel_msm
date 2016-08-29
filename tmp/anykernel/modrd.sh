@@ -101,15 +101,8 @@ mako_hotplug=0
             i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq 384000
             i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq 384000
             i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq 384000
-            i\    write /sys/devices/system/cpu/cpu1/online 1
-            i\    write /sys/devices/system/cpu/cpu2/online 1
-            i\    write /sys/devices/system/cpu/cpu3/online 1
             i\    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 95
-            i\    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_multi_core 70
-            i\    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_any_cpu_load 80
             i\    write /sys/devices/system/cpu/cpufreq/ondemand/down_threshold 8
-            i\    write /sys/devices/system/cpu/cpufreq/ondemand/down_differential 10
-            i\    write /sys/devices/system/cpu/cpufreq/ondemand/down_differential_multi_core 3
             i\    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate 50000
             i\    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor 2
             i\    write /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy 1
@@ -119,8 +112,6 @@ mako_hotplug=0
             i\    write /sys/devices/system/cpu/cpu1/cpufreq/util_threshold 30
             i\    write /sys/devices/system/cpu/cpu2/cpufreq/util_threshold 35
             i\    write /sys/devices/system/cpu/cpu3/cpufreq/util_threshold 40
-            i\    write /sys/devices/system/cpu/cpufreq/ondemand/optimal_freq 918000
-            i\    write /sys/devices/system/cpu/cpufreq/ondemand/sync_freq 1026000
             i\    write /dev/cpuctl/cpu.notify_on_migrate 1
             i\\
             i\    # Set GPU governor to interactive
