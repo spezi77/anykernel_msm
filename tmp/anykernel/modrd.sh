@@ -6,6 +6,7 @@
 
 # Config for picking the default hotplug (0..off / 1..on)
 # Warning: Only enable one hotplug driver at a time!
+alucard_hotplug=0
 autosmp_hotplug=0
 dyn_hotplug=1
 mako_hotplug=0
@@ -38,6 +39,7 @@ mako_hotplug=0
     sed -e '/KSM/ d' -i init.mako.rc
     sed -e '/intelli_plug/ d' -i init.mako.rc
     sed -e '/max_gpuclk/ d' -i init.mako.rc
+    sed -e '/NeXus4ever Tweaks/ d' -i init.mako.rc
 
     # Remove end marker (if applicable)
     sed -e '/# <-- Revival Tweaks END -->/ { N; d; }' -i init.mako.rc
@@ -131,14 +133,36 @@ mako_hotplug=0
 # CPU Hotplugs section
     # Prevent duplicates
     sed -e '/# <-- Revival Tweaks END -->/ { N; d; }' -i init.mako.rc
+    sed -e '/alucard-hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/autosmp-hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/dyn_hotplug/ d' -i init.mako.rc
     sed -e '/mako-hotplug/ { N; d; }' -i init.mako.rc
     sed -e '/auto-hotplug/ { N; d; }' -i init.mako.rc
 
+if [ $alucard_hotplug -eq 1 ] ; then
+    # Set alucard_hotplug as default while other hotplugs are set to disabled
+    sed '/# disable diag port/ {
+        i\    # Enable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 1
+        i\\
+        i\    # Enable autosmp-hotplug
+        i\    write /sys/module/autosmp/parameters/enabled Y
+        i\\
+        i\    # Disable dyn_hotplug
+        i\    write /sys/module/dyn_hotplug/parameters/enabled 0
+        i\\
+        i\    # Disable mako-hotplug
+        i\    write /sys/class/misc/mako_hotplug_control/enabled 0
+        i\\
+        }'  -i init.mako.rc
+fi
+
 if [ $autosmp_hotplug -eq 1 ] ; then
     # Set autosmp_hotplug as default while other hotplugs are set to disabled
     sed '/# disable diag port/ {
+        i\    # Disable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
+        i\\
         i\    # Enable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled Y
         i\\
@@ -154,6 +178,9 @@ fi
 if [ $dyn_hotplug -eq 1 ] ; then
     # Set dyn_hotplug as default while other hotplugs are set to disabled
     sed '/# disable diag port/ {
+        i\    # Disable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
+        i\\
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
@@ -170,6 +197,9 @@ fi
 if [ $mako_hotplug -eq 1 ] ; then
     # Set mako-hotplug as default while other hotplugs are set to disabled
     sed '/# disable diag port/ {
+        i\    # Disable alucard-hotplug
+        i\    write /sys/kernel/alucard_hotplug/hotplug_enable 0
+        i\\
         i\    # Disable autosmp-hotplug
         i\    write /sys/module/autosmp/parameters/enabled N
         i\\
@@ -185,6 +215,28 @@ fi
 # Add marker to indicate where HS tweaks have an end
 sed '/# disable diag port/ {
         i\    # <-- Revival Tweaks END -->
+        i\\
+        }' -i init.mako.rc
+
+# Workaround to add back the "on charger" CPU Freq Sampling rates
+sed -e '/power_collapse\/idle_enabled 1/ { N; d; }' -i init.mako.rc
+sed '/service rmt_storage \/system\/bin\/rmt_storage/ {
+        i\    write /sys/module/pm_8x60/modes/cpu0/power_collapse/idle_enabled 1
+        i\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "powersave"
+        i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "powersave"
+        i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "powersave"
+        i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor "powersave"
+        i\    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 90
+        i\    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate 50000
+        i\    write /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy 1
+        i\    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor 4
+        i\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 384000
+        i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq 384000
+        i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq 384000
+        i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq 384000
+        i\    write /sys/devices/system/cpu/cpu1/online 0
+        i\    write /sys/devices/system/cpu/cpu2/online 0
+        i\    write /sys/devices/system/cpu/cpu3/online 0
         i\\
         }' -i init.mako.rc
 
