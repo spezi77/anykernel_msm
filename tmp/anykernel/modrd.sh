@@ -122,7 +122,7 @@ mako_hotplug=0
             i\\
             i\    # Speed up io
             i\    write /sys/block/mmcblk0/queue/nr_requests 256
-            i\    write /sys/block/mmcblk0/queue/scheduler tripndroid
+            i\    write /sys/block/mmcblk0/queue/scheduler noop
             i\\
             i\    # enable KSM
             i\    write /sys/kernel/mm/ksm/run 1
