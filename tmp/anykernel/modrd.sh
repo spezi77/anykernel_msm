@@ -30,14 +30,17 @@ zendecision=0
     sed -e '/Disable thermald/ { N; d; }' -i init.mako.rc
     sed -e '/CPU governor/ d' -i init.mako.rc
     sed -e '/sys\/devices\/system\/cpu/ d' -i init.mako.rc
+    sed -e '/notify_on_migrate/ d' -i init.mako.rc
     sed -e '/Slightly lower voltage/ { N; d; }' -i init.mako.rc
     sed -e '/Speed up io/ { N; d; }' -i init.mako.rc
+    sed -e '/scheduler/ d' -i init.mako.rc
     sed -e '/fsync/ d' -i init.mako.rc
     sed -e '/kgsl/ d' -i init.mako.rc
     sed -e '/ksm/ d' -i init.mako.rc
     sed -e '/KSM/ d' -i init.mako.rc
     sed -e '/intelli_plug/ d' -i init.mako.rc
     sed -e '/max_gpuclk/ d' -i init.mako.rc
+    sed -e '/NeXus4ever Tweaks/ d' -i init.mako.rc
 
     # Remove end marker (if applicable)
     sed -e '/# <-- Revival Tweaks END -->/ { N; d; }' -i init.mako.rc
@@ -115,9 +118,7 @@ zendecision=0
             i\    write /sys/devices/system/cpu/cpu1/cpufreq/screen_off_max_freq 1026000
             i\    write /sys/devices/system/cpu/cpu2/cpufreq/screen_off_max_freq 1026000
             i\    write /sys/devices/system/cpu/cpu3/cpufreq/screen_off_max_freq 1026000
-            i\    write /sys/devices/system/cpu/cpu1/online 1
-            i\    write /sys/devices/system/cpu/cpu2/online 0
-            i\    write /sys/devices/system/cpu/cpu3/online 0
+            i\    write /dev/cpuctl/cpu.notify_on_migrate 1
             i\\
             i\    # Set GPU governor to simple
             i\    write /sys/class/kgsl/kgsl-3d0/pwrscale/trustzone/governor simple
@@ -125,6 +126,7 @@ zendecision=0
             i\\
             i\    # Speed up io
             i\    write /sys/block/mmcblk0/queue/nr_requests 256
+            i\    write /sys/block/mmcblk0/queue/scheduler noop
             i\\
             i\    # enable KSM
             i\    write /sys/kernel/mm/ksm/run 1
@@ -254,7 +256,27 @@ sed '/# disable diag port/ {
         i\    # Set FSYNC to enabled to prevent data loss
         i\    write /sys/module/sync/parameters/fsync_enabled Y
         i\\
-        i\    # <-- HellSpawn Tweaks END -->
+        }' -i init.mako.rc
+
+# Workaround to add back the "on charger" CPU Freq Sampling rates
+sed -e '/power_collapse\/idle_enabled 1/ { N; d; }' -i init.mako.rc
+sed '/service rmt_storage \/system\/bin\/rmt_storage/ {
+        i\    write /sys/module/pm_8x60/modes/cpu0/power_collapse/idle_enabled 1
+        i\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "powersave"
+        i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "powersave"
+        i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "powersave"
+        i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor "powersave"
+        i\    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 90
+        i\    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate 50000
+        i\    write /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy 1
+        i\    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor 4
+        i\    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 384000
+        i\    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq 384000
+        i\    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq 384000
+        i\    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq 384000
+        i\    write /sys/devices/system/cpu/cpu1/online 0
+        i\    write /sys/devices/system/cpu/cpu2/online 0
+        i\    write /sys/devices/system/cpu/cpu3/online 0
         i\\
         }' -i init.mako.rc
 
