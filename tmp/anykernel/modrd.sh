@@ -59,26 +59,6 @@ zendecision=0
             i\    stop mpdecision
             i\\
             }'  -i init.mako.rc
-    if [ `grep -c "# Use mpdfake service to absorb logcat spam" init.mako.rc` -eq 0 ] ; then
-    # Use mpdfake service to absorb logcat spam
-        sed '/service thermald/ {
-            i\# Use mpdfake service to absorb logcat spam
-            i\service mpdfake /system/bin/mpdfake
-            i\    class core
-            i\    user root
-            i\    group system
-            i\    socket pb stream 660 root system
-            i\    seclabel u:r:init:s0
-            i\\
-            }'  -i init.mako.rc
-    fi
-    # Start mpdfake
-        sed '/# disable diag port/ {
-            i\    # Run mpdfake service to absorb logcat spam
-            i\    mkdir /dev/socket/mpdfake 2770 root system
-            i\    start mpdfake
-            i\\
-            }'  -i init.mako.rc
     # Stop thermald 
         sed '/# disable diag port/ {
             i\    # Disable thermald service
