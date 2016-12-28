@@ -25,7 +25,7 @@ mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "/system"
 ui_print(" Extracting files...");
 package_extract_dir("system", "/system");
 run_program("/tmp/anykernel/tidyup.sh");
-unmount("/system")
+unmount("/system");
 ui_print("hellspawn kernel installed.");
 ui_print("don't blame me if you have bricked your device! ;)");
 set_progress(1.000000);
